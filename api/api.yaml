@@ -1,0 +1,180 @@
+openapi: 3.1.0
+info:
+  title: MEDODS Test Task
+  description: "Решение тестового задания"
+  version: 1.0.0
+
+
+paths:
+  /auth/signIn:
+    post:
+      tags:
+        - auth
+      summary: Get access and refresh tokens
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              username: "admin"
+              password: "strongpaswword"
+      responses:
+        '201':
+          description: Successful operation
+          content:
+            application/json:
+              example:
+                {"access": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NDcxNjg3MTksImp0aSI6IjM0IiwiZ3VpZCI6IjVlNzEzOTAzLWFlZDUtNDRjMS04ZGZiLTVlMDA4MzBiZjBmNyJ9.RHrcsVtEwNEa1iKCcOxpitpM8_LYCK3OfS-S9NJhd7GJ2sbRAyLF7w8t2OXFOdrU3T4qlBn23ZN0J4yF0Z_QQA",
+                 "refresh": "ZmQ0MzkwNzYtMTVmYS00M2QxLWJlMGYtYTQwNGNjMDg4ZGNk"}
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              example:
+                {"Password": "required"}
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              example:
+                {"message": "Internal error"}
+
+
+  /auth/signOut:
+    post:
+      tags:
+        - auth
+      summary: Block all concrete user refresh tokens
+      security:
+        - BearerAuth: []
+      responses:
+        '201':
+          description: Successful operation
+          content:
+            application/json:
+              example:
+                {"Message": "You have successfully signed out"}
+        '401':
+          description: Invalid JWT token
+          content:
+            application/json:
+              example:
+                {"message": "Unauthorized"}
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              example:
+                {"message": "Internal error"}
+
+  /auth/refresh:
+    post:
+      tags:
+        - auth
+      summary: Refresh token
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              refresh: "ZmQ0MzkwNzYtMTVmYS00M2QxLWJlMGYtYTQwNGNjMDg4ZGNk"
+      responses:
+        '201':
+          description: Successful operation
+          content:
+            application/json:
+              example:
+                {"access": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NDcxNjg3MTksImp0aSI6IjM0IiwiZ3VpZCI6IjVlNzEzOTAzLWFlZDUtNDRjMS04ZGZiLTVlMDA4MzBiZjBmNyJ9.RHrcsVtEwNEa1iKCcOxpitpM8_LYCK3OfS-S9NJhd7GJ2sbRAyLF7w8t2OXFOdrU3T4qlBn23ZN0J4yF0Z_QQA",
+                 "refresh": "ZmQ0MzkwNzYtMTVmYS00M2QxLWJlMGYtYTQwNGNjMDg4ZGNk"}
+        '401':
+          description: Invalid JWT token
+          content:
+            application/json:
+              example:
+                {"message": "Unauthorized"}
+        '403':
+          description: Invalid request data or access token pair
+          content:
+            application/json:
+              example:
+                {"message": "Forbidden", "reason": "New user agent",}
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              example:
+                {"message": "Internal error"}
+
+  /user:
+    get:
+      tags:
+        - user
+      summary: Get user info
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              example:
+                {
+                  "guid": "5e713903-aed5-44c1-8dfb-5e00830bf0f7",
+                  "username": "ilya",
+                  "password": "$2a$10$CrXJ0J/qX6NLm5tPqo072u21CDumvXcSAo2G.rNMosKOikt5kPH/a"
+                }
+        '401':
+          description: Invalid JWT token
+          content:
+            application/json:
+              example:
+                {"message": "Unauthorized"}
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              example:
+                {"message": "Internal error"}
+
+  /user/register:
+    post:
+      tags:
+        - user
+      summary: Create new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              username: "admin"
+              password: "strongpaswword"
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              example:
+                {
+                  "Message": "Success register user"
+                }
+        '400':
+          description: Invalid data
+          content:
+            application/json:
+              example:
+                {"username": "already exists"}
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              example:
+                {"message": "Internal error"}
+
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Введите токен в формате "Bearer <ваш_токен>"
