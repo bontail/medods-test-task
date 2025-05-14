@@ -44,7 +44,7 @@ func (h *AuthHandler) SignIn(c *gin.Context) {
 
 func (h *AuthHandler) sendTokens(c *gin.Context, userGUID string, addr netip.Addr) {
 	createdAt := time.Now()
-	expiresAt := createdAt.Add(time.Duration(h.Cfg.AccessTokenLifetimeSeconds) * time.Second)
+	expiresAt := createdAt.Add(time.Duration(h.Cfg.RefreshTokenLifetimeHours) * time.Hour)
 	randomValue := uuid.NewString()
 	refreshToken, err := models.NewRefreshToken(userGUID, randomValue, createdAt, expiresAt, c.Request.UserAgent(), addr)
 	if err != nil {
@@ -57,6 +57,7 @@ func (h *AuthHandler) sendTokens(c *gin.Context, userGUID string, addr netip.Add
 		return
 	}
 
+	expiresAt = createdAt.Add(time.Duration(h.Cfg.AccessTokenLifetimeSeconds) * time.Second)
 	accessToken := models.NewAccessToken(userGUID, refreshToken.Id, expiresAt)
 	access, err := accessToken.Encode(h.Cfg.SecretKey)
 	if err != nil {
