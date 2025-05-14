@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"errors"
-	"fmt"
 	"log/slog"
 	"net/http"
 	"net/netip"
@@ -23,15 +22,6 @@ type BaseHandler struct {
 
 func (h *BaseHandler) SendRequest(c *gin.Context, code int, obj interface{}) {
 	c.JSON(code, obj)
-	h.Lgr.Info(
-		"send request",
-		slog.String("method", c.Request.Method),
-		slog.String("path", c.Request.URL.Path),
-		slog.Int("code", code),
-		slog.String("data", fmt.Sprintf("%v", obj)),
-		slog.String("ip", c.ClientIP()),
-		slog.String("ua", c.Request.UserAgent()),
-	)
 }
 
 func (h *BaseHandler) SendFieldErrors(c *gin.Context, err error) {

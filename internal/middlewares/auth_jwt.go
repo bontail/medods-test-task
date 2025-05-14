@@ -24,24 +24,26 @@ func NewJWTMiddleware(lgr *slog.Logger, cfg *config.Config) JWTMiddleware {
 	}
 }
 
-func (m JWTMiddleware) MiddlewareFunc(c *gin.Context) {
-	auth := strings.Split(c.GetHeader("Authorization"), " ")
-	if len(auth) != 2 {
-		m.lgr.Info("Authorization Error",
-			slog.String("err", "Invalid len in Authorization "+strconv.Itoa(len(auth))),
-		)
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": "Unauthorized"})
-		return
-	}
-	accessToken, err := models.NewAccessTokenFromString(auth[1], m.cfg.SecretKey)
-	if err != nil {
-		m.lgr.Info("Authorization Error",
-			slog.String("err", err.Error()),
-		)
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": "Unauthorized"})
-		return
-	}
+func (m JWTMiddleware) MiddlewareFunc() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		auth := strings.Split(c.GetHeader("Authorization"), " ")
+		if len(auth) != 2 {
+			m.lgr.Info("Authorization Error",
+				slog.String("err", "Invalid len in Authorization "+strconv.Itoa(len(auth))),
+			)
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": "Unauthorized"})
+			return
+		}
+		accessToken, err := models.NewAccessTokenFromString(auth[1], m.cfg.SecretKey)
+		if err != nil {
+			m.lgr.Info("Authorization Error",
+				slog.String("err", err.Error()),
+			)
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": "Unauthorized"})
+			return
+		}
 
-	c.Set("token", accessToken)
-	c.Next()
+		c.Set("token", accessToken)
+		c.Next()
+	}
 }

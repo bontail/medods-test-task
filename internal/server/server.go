@@ -78,20 +78,22 @@ func Run(ctx context.Context) {
 	userStorage := postgresql.UserStorage(postgresql.NewDefaultUserStorage(pool, logger))
 	authStorage := postgresql.AuthStorage(postgresql.NewDefaultAuthStorage(pool, logger))
 
-	jwtMiddleware := middlewares.NewJWTMiddleware(logger, serverCfg)
+	jwtMiddleware := middlewares.Middleware(middlewares.NewJWTMiddleware(logger, serverCfg))
+	lgrMiddleware := middlewares.Middleware(middlewares.NewLoggerMiddleware(logger, serverCfg))
 
 	authHandler := handlersAuth.NewAuthHandler(userStorage, authStorage, logger, serverCfg, ntf)
 	userHandler := handlersUser.NewUserHandler(userStorage, logger, serverCfg, ntf)
 
 	router := gin.New()
+	router.Use(lgrMiddleware.MiddlewareFunc())
 
 	authGroup := router.Group("/auth")
 	authGroup.POST("/signIn", authHandler.SignIn)
-	authGroup.POST("/signOut", jwtMiddleware.MiddlewareFunc, authHandler.SignOut)
-	authGroup.POST("/refresh", jwtMiddleware.MiddlewareFunc, authHandler.Refresh)
+	authGroup.POST("/signOut", jwtMiddleware.MiddlewareFunc(), authHandler.SignOut)
+	authGroup.POST("/refresh", jwtMiddleware.MiddlewareFunc(), authHandler.Refresh)
 
 	userGroup := router.Group("/user")
-	userGroup.GET("", jwtMiddleware.MiddlewareFunc, userHandler.GetUser)
+	userGroup.GET("", jwtMiddleware.MiddlewareFunc(), userHandler.GetUser)
 	userGroup.POST("/register", userHandler.Register)
 
 	err = router.Run(serverCfg.Host + ":" + strconv.Itoa(serverCfg.Port))
