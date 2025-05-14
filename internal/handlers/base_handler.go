@@ -21,7 +21,7 @@ type BaseHandler struct {
 }
 
 func (h *BaseHandler) SendRequest(c *gin.Context, code int, obj interface{}) {
-	c.JSON(code, obj)
+	c.AbortWithStatusJSON(code, obj)
 }
 
 func (h *BaseHandler) SendFieldErrors(c *gin.Context, err error) {
@@ -42,6 +42,11 @@ func (h *BaseHandler) SendFieldErrors(c *gin.Context, err error) {
 
 func (h *BaseHandler) SendInternalError(c *gin.Context, err error) {
 	h.SendRequest(c, http.StatusInternalServerError, gin.H{"message": "Internal error"})
+	h.Lgr.Error(err.Error())
+}
+
+func (h *BaseHandler) SendAuthorizationError(c *gin.Context, err error) {
+	h.SendRequest(c, http.StatusUnauthorized, gin.H{"message": "Unauthorized"})
 	h.Lgr.Error(err.Error())
 }
 
