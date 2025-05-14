@@ -1,8 +1,6 @@
 package handlers
 
 import (
-	"net/http"
-
 	"github.com/gin-gonic/gin"
 )
 
@@ -33,9 +31,7 @@ func (h *AuthHandler) Refresh(c *gin.Context) {
 		return
 	}
 	if refreshToken == nil || refreshToken.CompareSecretValue(data.Refresh) {
-		h.SendRequest(c, http.StatusForbidden, gin.H{
-			"message": "Forbidden", "reason": "Invalid data or access token pair",
-		})
+		h.SendForbiddenError(c, "Invalid data or access token pair")
 		return
 	}
 	if refreshToken.UserAgent != c.Request.UserAgent() {
@@ -43,9 +39,7 @@ func (h *AuthHandler) Refresh(c *gin.Context) {
 			h.SendInternalError(c, err)
 			return
 		}
-		h.SendRequest(c, http.StatusForbidden, gin.H{
-			"message": "Forbidden", "reason": "New user agent",
-		})
+		h.SendForbiddenError(c, "New user agent")
 		return
 	}
 

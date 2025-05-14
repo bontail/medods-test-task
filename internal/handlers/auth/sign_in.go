@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"encoding/base64"
-	"net/http"
 	"net/netip"
 	"time"
 
@@ -30,7 +29,7 @@ func (h *AuthHandler) SignIn(c *gin.Context) {
 		return
 	}
 	if user == nil || !user.ComparePassword(data.Password) {
-		h.SendRequest(c, http.StatusBadRequest, gin.H{"message": "user with this credentials does not exist"})
+		h.SendBadRequestError(c, gin.H{"message": "user with this credentials does not exist"})
 		return
 	}
 
@@ -65,7 +64,7 @@ func (h *AuthHandler) sendTokens(c *gin.Context, userGUID string, addr netip.Add
 		return
 	}
 
-	h.SendRequest(c, http.StatusCreated, map[string]string{
+	h.SendCreated(c, gin.H{
 		"access":  access,
 		"refresh": base64.StdEncoding.EncodeToString([]byte(randomValue)),
 	})

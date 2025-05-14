@@ -1,8 +1,6 @@
 package handlers
 
 import (
-	"net/http"
-
 	"github.com/gin-gonic/gin"
 
 	"medods-test-task/internal/models"
@@ -32,7 +30,7 @@ func (h *UserHandler) Register(c *gin.Context) {
 		return
 	}
 	if exists {
-		h.SendRequest(c, http.StatusBadRequest, gin.H{"username": "already exists"})
+		h.SendBadRequestError(c, gin.H{"username": "already exists"})
 		return
 	}
 
@@ -41,5 +39,5 @@ func (h *UserHandler) Register(c *gin.Context) {
 		return
 	}
 
-	h.SendRequest(c, http.StatusCreated, gin.H{"Message": "Success register user"})
+	h.SendCreated(c, gin.H{"Message": "Success register user"})
 }

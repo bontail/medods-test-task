@@ -1,8 +1,6 @@
 package handlers
 
 import (
-	"net/http"
-
 	"github.com/gin-gonic/gin"
 )
 
@@ -19,5 +17,5 @@ func (h *UserHandler) GetUser(c *gin.Context) {
 		return
 	}
 
-	h.SendRequest(c, http.StatusOK, user)
+	h.SendOK(c, user)
 }

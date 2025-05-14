@@ -24,6 +24,18 @@ func (h *BaseHandler) SendRequest(c *gin.Context, code int, obj interface{}) {
 	c.AbortWithStatusJSON(code, obj)
 }
 
+func (h *BaseHandler) SendOK(c *gin.Context, obj interface{}) {
+	c.AbortWithStatusJSON(http.StatusOK, obj)
+}
+
+func (h *BaseHandler) SendCreated(c *gin.Context, obj interface{}) {
+	c.AbortWithStatusJSON(http.StatusCreated, obj)
+}
+
+func (h *BaseHandler) SendBadRequestError(c *gin.Context, obj interface{}) {
+	h.SendRequest(c, http.StatusBadRequest, obj)
+}
+
 func (h *BaseHandler) SendFieldErrors(c *gin.Context, err error) {
 	var res any
 	var validateErrs validator.ValidationErrors
@@ -37,7 +49,7 @@ func (h *BaseHandler) SendFieldErrors(c *gin.Context, err error) {
 		res = gin.H{"error": err.Error()}
 	}
 
-	h.SendRequest(c, http.StatusBadRequest, res)
+	h.SendBadRequestError(c, res)
 }
 
 func (h *BaseHandler) SendInternalError(c *gin.Context, err error) {
@@ -48,6 +60,12 @@ func (h *BaseHandler) SendInternalError(c *gin.Context, err error) {
 func (h *BaseHandler) SendAuthorizationError(c *gin.Context, err error) {
 	h.SendRequest(c, http.StatusUnauthorized, gin.H{"message": "Unauthorized"})
 	h.Lgr.Error(err.Error())
+}
+
+func (h *BaseHandler) SendForbiddenError(c *gin.Context, reason string) {
+	h.SendRequest(c, http.StatusForbidden, gin.H{
+		"message": "Forbidden", "reason": reason,
+	})
 }
 
 func (h *BaseHandler) GetAccessToken(c *gin.Context) (*models.AccessToken, error) {

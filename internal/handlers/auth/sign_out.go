@@ -1,8 +1,6 @@
 package handlers
 
 import (
-	"net/http"
-
 	"github.com/gin-gonic/gin"
 )
 
@@ -19,5 +17,5 @@ func (h *AuthHandler) SignOut(c *gin.Context) {
 		return
 	}
 
-	h.SendRequest(c, http.StatusCreated, gin.H{"Message": "You have successfully signed out"})
+	h.SendCreated(c, gin.H{"Message": "You have successfully signed out"})
 }
