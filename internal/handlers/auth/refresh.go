@@ -49,7 +49,7 @@ func (h *AuthHandler) Refresh(c *gin.Context) {
 		return
 	}
 	if refreshToken.IP != addr {
-		go h.Ntf.NewIp(refreshToken.IP, addr, accessToken.GUID)
+		go h.Ntf.NewIp(accessToken.GUID, refreshToken.IP, addr)
 	}
 
 	if err = h.AuthStorage.BlockedToken(c, refreshToken.Id); err != nil {

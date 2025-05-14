@@ -22,8 +22,8 @@ func NewHTTPNotificator(cfg *config.Config, lgr *slog.Logger) *HTTPNotificator {
 	}
 }
 
-func (h *HTTPNotificator) NewIp(guid, oldIp netip.Addr, newIp string) {
-	data := map[string]string{"guid": guid.String(), "oldIp": oldIp.String(), "newIp": newIp}
+func (h *HTTPNotificator) NewIp(guid string, oldIp, newIp netip.Addr) {
+	data := map[string]string{"guid": guid, "oldIp": oldIp.String(), "newIp": newIp.String()}
 
 	j, _ := json.Marshal(data)
 

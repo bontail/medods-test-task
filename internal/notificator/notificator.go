@@ -5,5 +5,5 @@ import (
 )
 
 type Notificator interface {
-	NewIp(guid, oldIp netip.Addr, newIp string)
+	NewIp(guid string, oldIp, newIp netip.Addr)
 }
